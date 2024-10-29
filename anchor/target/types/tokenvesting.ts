@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/tokenvesting.json`.
  */
 export type Tokenvesting = {
-  "address": "AsjZ3kWAUSQRNt2pZVeJkywhZ6gpLpHZmJjduPmKZDZZ",
+  "address": "GirB4RLftuR6jcykp8S1GwNR9P6C7jVAyNjf6kZ1Mp5U",
   "metadata": {
     "name": "tokenvesting",
     "version": "0.1.0",
@@ -13,6 +13,168 @@ export type Tokenvesting = {
     "description": "Created with Anchor"
   },
   "instructions": [
+    {
+      "name": "claimTokens",
+      "discriminator": [
+        108,
+        216,
+        210,
+        231,
+        0,
+        212,
+        42,
+        64
+      ],
+      "accounts": [
+        {
+          "name": "beneficiary",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "employeeAccount"
+          ]
+        },
+        {
+          "name": "employeeAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  109,
+                  112,
+                  108,
+                  111,
+                  121,
+                  101,
+                  101,
+                  95,
+                  118,
+                  101,
+                  115,
+                  116,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "beneficiary"
+              },
+              {
+                "kind": "account",
+                "path": "vestingAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vestingAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "arg",
+                "path": "companyName"
+              }
+            ]
+          },
+          "relations": [
+            "employeeAccount"
+          ]
+        },
+        {
+          "name": "mint",
+          "relations": [
+            "vestingAccount"
+          ]
+        },
+        {
+          "name": "treasuryTokenAccount",
+          "writable": true,
+          "relations": [
+            "vestingAccount"
+          ]
+        },
+        {
+          "name": "employeeTokenAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "beneficiary"
+              },
+              {
+                "kind": "account",
+                "path": "tokenProgram"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "tokenProgram"
+        },
+        {
+          "name": "associatedTokenProgram",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
     {
       "name": "createEmployeeAccount",
       "discriminator": [
@@ -204,6 +366,23 @@ export type Tokenvesting = {
         228,
         216
       ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "claimNotAvailableYet",
+      "msg": "Claim not available yet! You can claim after the cliff time."
+    },
+    {
+      "code": 6001,
+      "name": "invalidVestingPeriod",
+      "msg": "Invalid vesting period! The vesting period must be greater than zero."
+    },
+    {
+      "code": 6002,
+      "name": "nothingToClaim",
+      "msg": "Nothing to claim..."
     }
   ],
   "types": [
