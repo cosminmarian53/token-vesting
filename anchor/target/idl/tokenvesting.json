@@ -240,7 +240,7 @@
       ],
       "args": [
         {
-          "name": "beneficiary",
+          "name": "_beneficiary",
           "type": "pubkey"
         },
         {

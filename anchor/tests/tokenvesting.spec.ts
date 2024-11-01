@@ -1,5 +1,5 @@
 import * as anchor from "@coral-xyz/anchor";
-import { Program } from "@coral-xyz/anchor";
+import { BN, Program } from "@coral-xyz/anchor";
 import { Keypair, PublicKey } from "@solana/web3.js";
 //@ts-expect-error - Type error in spl-token-bankrun dependency
 import { createMint } from "spl-token-bankrun";
@@ -9,7 +9,7 @@ import IDL from "../target/idl/tokenvesting.json";
 import { SYSTEM_PROGRAM_ID } from "@coral-xyz/anchor/dist/cjs/native/system";
 import { BankrunProvider } from "anchor-bankrun";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { mintTo, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 describe("Token Vesting Smart Contract Test", () => {
   const companyName = "coral";
   let beneficiary: Keypair;
@@ -90,5 +90,35 @@ describe("Token Vesting Smart Contract Test", () => {
     );
     console.log("Vesting Account Data: ", vestingAccountData, null, 2);
     console.log("Create vesting account: ", tx);
+  });
+  it("should fund the treasury token account", async () => {
+    const amount = 10_000 * 10 ** 9;
+    const mintTx = await mintTo(
+      //@ts-expect-error - Type error in spl-token-bankrun dependency
+      banksClient,
+      employer,
+      mint,
+      treasuryTokenAccount,
+      employer,
+      amount
+    );
+    console.log("Mint to treasury token account: ", mintTx);
+  });
+  it("should create employee vesting account", async () => {
+    const tx2 = await program.methods
+      .createEmployeeAccount(
+        beneficiary.publicKey,
+        new BN(0),
+        new BN(100),
+        new BN(100),
+        new BN(0)
+      )
+      .accounts({
+        beneficiary: beneficiary.publicKey,
+        vestingAccount: vestingAccountKey,
+      })
+      .rpc({ commitment: "confirmed", skipPreflight: true });
+    console.log("Create employee account: ", tx2);
+    console.log("Employee account: ", employeeAccount.toBase58());
   });
 });
