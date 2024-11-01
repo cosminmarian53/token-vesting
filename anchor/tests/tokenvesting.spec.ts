@@ -4,7 +4,12 @@ import { Keypair, PublicKey } from "@solana/web3.js";
 //@ts-expect-error - Type error in spl-token-bankrun dependency
 import { createMint } from "spl-token-bankrun";
 import { Tokenvesting } from "../target/types/tokenvesting";
-import { BanksClient, ProgramTestContext, startAnchor } from "solana-bankrun";
+import {
+  BanksClient,
+  Clock,
+  ProgramTestContext,
+  startAnchor,
+} from "solana-bankrun";
 import IDL from "../target/idl/tokenvesting.json";
 import { SYSTEM_PROGRAM_ID } from "@coral-xyz/anchor/dist/cjs/native/system";
 import { BankrunProvider } from "anchor-bankrun";
@@ -120,5 +125,23 @@ describe("Token Vesting Smart Contract Test", () => {
       .rpc({ commitment: "confirmed", skipPreflight: true });
     console.log("Create employee account: ", tx2);
     console.log("Employee account: ", employeeAccount.toBase58());
+  });
+  it("should claim the employee vested tokens", async () => {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const currentClock = await banksClient.getClock();
+    context.setClock(
+      new Clock(
+        currentClock.slot,
+        currentClock.epochStartTimestamp,
+        currentClock.epoch,
+        currentClock.leaderScheduleEpoch,
+        BigInt(1000)
+      )
+    );
+    const tx3 = await program2.methods
+      .claimTokens(new BN(companyName))
+      .accounts({ tokenProgram: TOKEN_PROGRAM_ID })
+      .rpc({ commitment: "confirmed" });
+    console.log("Claim tokens: ", tx3);
   });
 });

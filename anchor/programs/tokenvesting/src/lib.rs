@@ -29,7 +29,7 @@ pub mod tokenvesting {
 
     pub fn create_employee_account(
         ctx: Context<CreateEmployeeAccount>,
-        _beneficiary: Pubkey,
+        beneficiary: Pubkey,
         start_time: i64,
         end_time: i64,
         total_amount: u64,
